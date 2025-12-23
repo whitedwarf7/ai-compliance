@@ -1,0 +1,78 @@
+# Demo Policy for AI Compliance Platform
+# This policy is designed for demonstrations and pilots
+
+version: "1.0"
+name: "Demo Compliance Policy"
+description: |
+  Demo policy that showcases all compliance features.
+  Blocks critical PII, masks medium-sensitivity data, and warns on low-risk items.
+
+rules:
+  # Critical PII - Block immediately
+  # These are high-value targets for data breaches
+  block_if:
+    - AADHAAR      # India national ID
+    - PAN          # India tax ID
+    - CREDIT_CARD  # Payment card numbers
+    - SSN          # US Social Security
+
+  # Medium sensitivity - Mask before sending to AI
+  # Reduces exposure while allowing AI to process the intent
+  mask_if:
+    - EMAIL
+    - PHONE
+
+  # Low risk - Log warning but allow
+  # Useful for monitoring without blocking
+  warn_if:
+    - IP_ADDRESS
+    - DATE_OF_BIRTH
+
+  # Approved models only
+  allowed_models:
+    - gpt-4o
+    - gpt-4o-mini
+    - gpt-4-turbo
+    - gpt-4
+    - gpt-3.5-turbo
+
+  # No blocked models in demo
+  blocked_models: []
+
+  # Allow all apps in demo mode
+  allowed_apps:
+    - "*"
+
+  blocked_apps: []
+
+# Organization-specific overrides for demo
+org_overrides:
+  # Stricter policy for finance org
+  org-finance:
+    block_if:
+      - AADHAAR
+      - PAN
+      - CREDIT_CARD
+      - SSN
+      - EMAIL        # Finance blocks email too
+    mask_if:
+      - PHONE
+    allowed_models:
+      - gpt-4o       # Only GPT-4o for finance
+
+  # Relaxed policy for internal tools org
+  org-internal:
+    block_if:
+      - CREDIT_CARD
+      - SSN
+    mask_if:
+      - EMAIL
+      - PHONE
+      - AADHAAR
+      - PAN
+    allowed_models:
+      - gpt-4o
+      - gpt-4o-mini
+      - gpt-4-turbo
+      - gpt-3.5-turbo
+

@@ -1,0 +1,63 @@
+version: "1.0"
+name: "Default Compliance Policy"
+description: |
+  Default policy for AI Compliance Platform.
+  Blocks critical PII (Aadhaar, PAN, Credit Cards, SSN).
+  Masks medium-sensitivity PII (Email, Phone).
+  Warns on low-sensitivity data (IP addresses).
+
+rules:
+  # Block requests containing these PII types
+  # These are considered critical and should never be sent to AI providers
+  block_if:
+    - AADHAAR
+    - PAN
+    - CREDIT_CARD
+    - SSN
+
+  # Mask these PII types before forwarding to AI provider
+  # The original values are replaced with [TYPE_REDACTED]
+  mask_if:
+    - EMAIL
+    - PHONE
+
+  # Log a warning but allow the request
+  # These are low-risk but worth monitoring
+  warn_if:
+    - IP_ADDRESS
+    - DATE_OF_BIRTH
+
+  # Only these models are allowed
+  # Empty list means all models are allowed
+  allowed_models:
+    - gpt-4o
+    - gpt-4o-mini
+    - gpt-4-turbo
+    - gpt-4
+    - gpt-3.5-turbo
+
+  # These models are explicitly blocked
+  blocked_models: []
+
+  # Only these applications can use the gateway
+  # Use "*" to allow all applications
+  allowed_apps:
+    - "*"
+
+  # These applications are explicitly blocked
+  blocked_apps: []
+
+# Organization-specific policy overrides
+# These override the default rules for specific organizations
+org_overrides:
+  # Example: Stricter policy for finance org
+  # org-finance:
+  #   block_if:
+  #     - AADHAAR
+  #     - PAN
+  #     - CREDIT_CARD
+  #     - SSN
+  #     - EMAIL  # Also block email for finance
+  #   allowed_models:
+  #     - gpt-4o  # Only allow GPT-4o for finance
+

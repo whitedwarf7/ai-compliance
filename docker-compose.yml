@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ai-compliance-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ai_compliance}
+      POSTGRES_USER: ${POSTGRES_USER:-compliance_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-this-secure-password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./services/audit/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - compliance-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-compliance_user} -d ${POSTGRES_DB:-ai_compliance}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  gateway:
+    build:
+      context: ./services/gateway
+      dockerfile: Dockerfile
+    container_name: ai-compliance-gateway
+    environment:
+      # AI Provider
+      - AI_PROVIDER=${AI_PROVIDER:-openai}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
+      - AZURE_OPENAI_DEPLOYMENT=${AZURE_OPENAI_DEPLOYMENT}
+      - AZURE_OPENAI_API_VERSION=${AZURE_OPENAI_API_VERSION:-2024-02-15-preview}
+      - DEFAULT_MODEL=${DEFAULT_MODEL:-gpt-4o}
+      - AUDIT_SERVICE_URL=http://audit:8001
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - SECRET_KEY=${SECRET_KEY:-change-this-to-a-secure-random-string}
+      # Phase 2: PII Detection & Policy
+      - PII_DETECTION_ENABLED=${PII_DETECTION_ENABLED:-true}
+      - PII_DETECTION_LOG_MATCHES=${PII_DETECTION_LOG_MATCHES:-false}
+      - POLICY_FILE=/app/policies/default.yaml
+      - POLICY_HOT_RELOAD=${POLICY_HOT_RELOAD:-true}
+      - ENFORCEMENT_MODE=${ENFORCEMENT_MODE:-enforce}
+      # Alerts
+      - ALERT_SLACK_WEBHOOK=${ALERT_SLACK_WEBHOOK:-}
+      - ALERT_EMAIL_ENABLED=${ALERT_EMAIL_ENABLED:-false}
+      - ALERT_EMAIL_SMTP_HOST=${ALERT_EMAIL_SMTP_HOST:-}
+      - ALERT_EMAIL_SMTP_PORT=${ALERT_EMAIL_SMTP_PORT:-587}
+      - ALERT_EMAIL_SMTP_USER=${ALERT_EMAIL_SMTP_USER:-}
+      - ALERT_EMAIL_SMTP_PASSWORD=${ALERT_EMAIL_SMTP_PASSWORD:-}
+      - ALERT_EMAIL_FROM=${ALERT_EMAIL_FROM:-}
+      - ALERT_EMAIL_TO=${ALERT_EMAIL_TO:-}
+    volumes:
+      - ./policies:/app/policies:ro
+    ports:
+      - "8000:8000"
+    networks:
+      - compliance-network
+    depends_on:
+      audit:
+        condition: service_healthy
+    restart: unless-stopped
+
+  audit:
+    build:
+      context: ./services/audit
+      dockerfile: Dockerfile
+    container_name: ai-compliance-audit
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-compliance_user}:${POSTGRES_PASSWORD:-change-this-secure-password}@postgres:5432/${POSTGRES_DB:-ai_compliance}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - LOG_RETENTION_DAYS=${LOG_RETENTION_DAYS:-365}
+      - JWT_SECRET=${JWT_SECRET:-change-this-jwt-secret}
+      - JWT_EXPIRY_HOURS=${JWT_EXPIRY_HOURS:-24}
+    ports:
+      - "8001:8001"
+    networks:
+      - compliance-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: ai-compliance-dashboard
+    ports:
+      - "3000:3000"
+    networks:
+      - compliance-network
+    depends_on:
+      - audit
+      - gateway
+    restart: unless-stopped
+
+networks:
+  compliance-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
