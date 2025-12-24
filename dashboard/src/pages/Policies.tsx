@@ -1,6 +1,5 @@
-import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { RefreshCw, Save, Shield, AlertCircle, CheckCircle } from 'lucide-react'
+import { RefreshCw, Shield, AlertCircle, CheckCircle } from 'lucide-react'
 import { api } from '../api/client'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
@@ -23,9 +22,8 @@ const demoPolicy = {
 
 export default function Policies() {
   const queryClient = useQueryClient()
-  const [isEditing, setIsEditing] = useState(false)
   
-  const { data: policy, isLoading } = useQuery({
+  const { data: policy } = useQuery({
     queryKey: ['policy'],
     queryFn: () => api.getPolicy(),
     placeholderData: demoPolicy,
@@ -86,7 +84,7 @@ export default function Policies() {
             Requests containing these PII types will be blocked immediately.
           </p>
           <div className="flex flex-wrap gap-2">
-            {currentPolicy.rules.block_if.map((type) => (
+            {currentPolicy.rules.block_if.map((type: string) => (
               <span key={type} className="badge badge-danger text-sm px-3 py-1">
                 {type}
               </span>
@@ -104,7 +102,7 @@ export default function Policies() {
             These PII types will be replaced with [TYPE_REDACTED] before sending to AI.
           </p>
           <div className="flex flex-wrap gap-2">
-            {currentPolicy.rules.mask_if.map((type) => (
+            {currentPolicy.rules.mask_if.map((type: string) => (
               <span key={type} className="badge badge-warning text-sm px-3 py-1">
                 {type}
               </span>
@@ -123,7 +121,7 @@ export default function Policies() {
           </p>
           <div className="flex flex-wrap gap-2">
             {currentPolicy.rules.warn_if.length > 0 ? (
-              currentPolicy.rules.warn_if.map((type) => (
+              currentPolicy.rules.warn_if.map((type: string) => (
                 <span key={type} className="badge badge-info text-sm px-3 py-1">
                   {type}
                 </span>
@@ -145,7 +143,7 @@ export default function Policies() {
           </p>
           <div className="flex flex-wrap gap-2">
             {currentPolicy.rules.allowed_models.length > 0 ? (
-              currentPolicy.rules.allowed_models.map((model) => (
+              currentPolicy.rules.allowed_models.map((model: string) => (
                 <span key={model} className="badge badge-success text-sm px-3 py-1">
                   {model}
                 </span>
@@ -166,16 +164,16 @@ name: "${currentPolicy.name}"
 
 rules:
   block_if:
-${currentPolicy.rules.block_if.map(t => `    - ${t}`).join('\n')}
+${currentPolicy.rules.block_if.map((t: string) => `    - ${t}`).join('\n')}
   
   mask_if:
-${currentPolicy.rules.mask_if.map(t => `    - ${t}`).join('\n')}
+${currentPolicy.rules.mask_if.map((t: string) => `    - ${t}`).join('\n')}
   
   warn_if:
-${currentPolicy.rules.warn_if.map(t => `    - ${t}`).join('\n')}
+${currentPolicy.rules.warn_if.map((t: string) => `    - ${t}`).join('\n')}
   
   allowed_models:
-${currentPolicy.rules.allowed_models.map(m => `    - ${m}`).join('\n')}`}
+${currentPolicy.rules.allowed_models.map((m: string) => `    - ${m}`).join('\n')}`}
         </pre>
         <p className="mt-4 text-sm text-slate-400">
           To modify the policy, edit the <code className="text-primary-400">policies/default.yaml</code> file
@@ -185,4 +183,5 @@ ${currentPolicy.rules.allowed_models.map(m => `    - ${m}`).join('\n')}`}
     </div>
   )
 }
+
 

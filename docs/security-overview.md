@@ -233,3 +233,4 @@ For security concerns or to report vulnerabilities:
 - Security team email: security@yourcompany.com
 - Response time: 24 hours for critical issues
 
+

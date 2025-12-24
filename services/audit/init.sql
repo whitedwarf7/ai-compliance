@@ -95,3 +95,4 @@ CREATE TRIGGER prevent_audit_log_delete
     FOR EACH ROW
     EXECUTE FUNCTION prevent_audit_log_modification();
 
+

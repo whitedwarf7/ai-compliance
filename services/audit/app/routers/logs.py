@@ -97,7 +97,7 @@ async def create_audit_log(
         token_count_output=log.token_count_output,
         latency_ms=log.latency_ms,
         risk_flags=log.risk_flags,
-        metadata=log.metadata,
+        request_metadata=log.metadata,
     )
 
     db.add(db_log)
@@ -116,7 +116,7 @@ async def create_audit_log(
         token_count_output=db_log.token_count_output,
         latency_ms=db_log.latency_ms,
         risk_flags=db_log.risk_flags or [],
-        metadata=db_log.metadata or {},
+        metadata=db_log.request_metadata or {},
         created_at=db_log.created_at,
     )
 
@@ -188,7 +188,7 @@ async def list_audit_logs(
                 token_count_output=log.token_count_output,
                 latency_ms=log.latency_ms,
                 risk_flags=log.risk_flags or [],
-                metadata=log.metadata or {},
+                metadata=log.request_metadata or {},
                 created_at=log.created_at,
             )
             for log in logs
@@ -279,7 +279,8 @@ async def get_audit_log(
         token_count_output=log.token_count_output,
         latency_ms=log.latency_ms,
         risk_flags=log.risk_flags or [],
-        metadata=log.metadata or {},
+        metadata=log.request_metadata or {},
         created_at=log.created_at,
     )
+
 

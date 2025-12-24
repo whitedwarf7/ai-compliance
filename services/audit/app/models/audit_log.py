@@ -53,6 +53,7 @@ class AuditLog(Base):
     token_count_output = Column(Integer, nullable=True)
     latency_ms = Column(Integer, nullable=True)
     risk_flags = Column(JSONB, default=list)
-    metadata = Column(JSONB, default=dict)
+    request_metadata = Column("metadata", JSONB, default=dict)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow, index=True)
+
 

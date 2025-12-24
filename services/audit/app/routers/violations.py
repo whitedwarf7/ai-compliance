@@ -94,7 +94,7 @@ async def get_violations_summary(
 
     for log in all_logs:
         # Count by action
-        action = (log.metadata or {}).get("action", "allowed")
+        action = (log.request_metadata or {}).get("action", "allowed")
         if action in action_counts:
             action_counts[action] += 1
 
@@ -157,7 +157,7 @@ async def get_violations_summary(
             "app_id": log.app_id,
             "model": log.model,
             "risk_flags": log.risk_flags or [],
-            "action": (log.metadata or {}).get("action", "unknown"),
+            "action": (log.request_metadata or {}).get("action", "unknown"),
             "created_at": log.created_at.isoformat() if log.created_at else None,
         }
         for log in recent
@@ -216,7 +216,7 @@ async def list_violations(
     if action:
         logs = [
             log for log in logs
-            if (log.metadata or {}).get("action") == action
+            if (log.request_metadata or {}).get("action") == action
         ]
 
     return [
@@ -227,7 +227,7 @@ async def list_violations(
             user_id=log.user_id,
             model=log.model,
             risk_flags=log.risk_flags or [],
-            action=(log.metadata or {}).get("action", "unknown"),
+            action=(log.request_metadata or {}).get("action", "unknown"),
             created_at=log.created_at,
         )
         for log in logs
@@ -274,7 +274,7 @@ async def get_violation_trends(
 
         daily_counts[date_str]["total"] += 1
 
-        action = (log.metadata or {}).get("action", "allowed")
+        action = (log.request_metadata or {}).get("action", "allowed")
         if action in daily_counts[date_str]:
             daily_counts[date_str][action] += 1
 
@@ -320,7 +320,7 @@ async def get_violations_by_type(
     type_counts: dict[str, dict[str, int]] = {}
 
     for log in logs:
-        action = (log.metadata or {}).get("action", "allowed")
+        action = (log.request_metadata or {}).get("action", "allowed")
 
         for pii_type in (log.risk_flags or []):
             if pii_type not in type_counts:
@@ -339,4 +339,5 @@ async def get_violations_by_type(
             for pii_type, counts in sorted(type_counts.items(), key=lambda x: x[1]["total"], reverse=True)
         ]
     }
+
 

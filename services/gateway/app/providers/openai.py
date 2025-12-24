@@ -32,3 +32,4 @@ class OpenAIProvider(BaseProvider):
         """Close the HTTP client."""
         await self.client.aclose()
 
+

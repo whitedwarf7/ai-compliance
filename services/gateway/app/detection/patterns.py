@@ -199,3 +199,4 @@ def get_severity_for_type(pii_type: PIIType) -> Severity:
         return pattern.severity
     return Severity.MEDIUM
 
+

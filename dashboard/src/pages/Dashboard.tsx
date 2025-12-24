@@ -125,7 +125,7 @@ export default function Dashboard() {
         <div className="card">
           <h3 className="text-lg font-medium text-white mb-4">Top Violating Applications</h3>
           <div className="space-y-3">
-            {(summary?.top_violating_apps || []).slice(0, 5).map((app, index) => (
+            {(summary?.top_violating_apps || []).slice(0, 5).map((app: { app_id: string; violation_count: number }, index: number) => (
               <div key={app.app_id} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
                 <div className="flex items-center">
                   <span className="w-6 h-6 flex items-center justify-center rounded-full bg-slate-600 text-xs text-white mr-3">
@@ -182,4 +182,5 @@ export default function Dashboard() {
     </div>
   )
 }
+
 

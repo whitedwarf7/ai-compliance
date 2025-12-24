@@ -131,7 +131,7 @@ export default function Violations() {
                   <td className="px-6 py-4 text-sm text-slate-300">{violation.model}</td>
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1">
-                      {violation.risk_flags.map((flag) => (
+                      {violation.risk_flags.map((flag: string) => (
                         <span
                           key={flag}
                           className={clsx(
@@ -167,4 +167,5 @@ export default function Violations() {
     </div>
   )
 }
+
 

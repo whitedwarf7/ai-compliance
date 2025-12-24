@@ -44,3 +44,4 @@ export default function PieChartComponent({ data, colors = DEFAULT_COLORS }: Pie
   )
 }
 
+

@@ -171,3 +171,4 @@ def get_user_from_token(token: str) -> User | None:
     except Exception:
         return None
 
+

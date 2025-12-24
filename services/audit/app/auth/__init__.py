@@ -14,3 +14,4 @@ __all__ = [
     "require_permission",
 ]
 
+

@@ -85,3 +85,4 @@ def test_chat_completions_success(mock_audit, mock_provider, client):
     assert data["id"] == "chatcmpl-123"
     assert len(data["choices"]) == 1
 
+

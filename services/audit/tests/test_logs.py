@@ -76,3 +76,4 @@ def test_get_audit_log_invalid_id(client):
     assert response.status_code == 400
     assert "Invalid log ID format" in response.json()["detail"]
 
+

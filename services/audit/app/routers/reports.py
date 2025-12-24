@@ -196,7 +196,7 @@ async def generate_audit_report(
     type_counts: dict[str, dict[str, int]] = {}
 
     for log in violation_logs:
-        action = (log.metadata or {}).get("action", "allowed")
+        action = (log.request_metadata or {}).get("action", "allowed")
         if action == "blocked":
             blocked += 1
         elif action == "masked":
@@ -352,4 +352,5 @@ async def generate_audit_report(
             "Content-Disposition": f"attachment; filename={filename}",
         },
     )
+
 

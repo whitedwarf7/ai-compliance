@@ -108,7 +108,7 @@ export default function AuditLogs() {
                 </td>
               </tr>
             ) : (
-              logs.map((log) => (
+              logs.map((log: AuditLog) => (
                 <tr key={log.id} className="hover:bg-slate-700/50 transition-colors">
                   <td className="px-6 py-4 text-sm text-slate-300">
                     {format(new Date(log.created_at), 'MMM d, HH:mm:ss')}
@@ -131,7 +131,7 @@ export default function AuditLogs() {
                   <td className="px-6 py-4">
                     {log.risk_flags.length > 0 ? (
                       <div className="flex flex-wrap gap-1">
-                        {log.risk_flags.map((flag) => (
+                        {log.risk_flags.map((flag: string) => (
                           <span key={flag} className="badge badge-danger">{flag}</span>
                         ))}
                       </div>
@@ -182,4 +182,5 @@ export default function AuditLogs() {
     </div>
   )
 }
+
 

@@ -97,3 +97,4 @@ def require_role(min_role: str) -> Callable:
 
     return _check_role
 
+

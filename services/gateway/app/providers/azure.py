@@ -42,3 +42,4 @@ class AzureOpenAIProvider(BaseProvider):
         """Close the HTTP client."""
         await self.client.aclose()
 
+
